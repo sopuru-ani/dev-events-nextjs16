@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
 // Interface for Event document
-export interface IEvent extends Document {
+export interface TEvent extends Document {
   title: string;
   slug: string;
   description: string;
@@ -9,7 +9,7 @@ export interface IEvent extends Document {
   image: string;
   venue: string;
   location: string;
-  date: string;
+  date: string | Date;
   time: string;
   mode: string;
   audience: string;
@@ -20,28 +20,45 @@ export interface IEvent extends Document {
   updatedAt: Date;
 }
 
+// export type TEvent = {
+//   title: string;
+//   slug: string;
+//   description: string;
+//   overview: string;
+//   image: string;
+//   venue: string;
+//   location: string;
+//   date: String | Date;
+//   time: string;
+//   mode: 'online' | 'offline' | 'hybrid';
+//   audience: string;
+//   agenda: string[];
+//   organizer: string;
+//   tags: string[];
+// };
+
 // Event schema definition
-const eventSchema = new Schema({
+const eventSchema = new Schema<TEvent>({
   title: { type: String, required: true, trim: true },
-  slug: { type: String, unique: true, trim: true },
+  slug: { type: String, required: true, unique: true, trim: true },
   description: { type: String, required: true, trim: true },
   overview: { type: String, required: true, trim: true },
   image: { type: String, required: true, trim: true },
   venue: { type: String, required: true, trim: true },
   location: { type: String, required: true, trim: true },
-  date: { type: String, required: true },
+  date: { type: Date, required: true },
   time: { type: String, required: true },
   mode: { type: String, required: true, enum: ['online', 'offline', 'hybrid'] },
   audience: { type: String, required: true, trim: true },
-  agenda: [{ type: String, required: true }],
+  agenda: { type: [String], required: true },
   organizer: { type: String, required: true, trim: true },
-  tags: [{ type: String, required: true }],
+  tags: { type: [String], required: true },
 }, {
   timestamps: true, // Auto-generates createdAt and updatedAt
 });
 
 // Pre-save hook for slug generation and data normalization
-eventSchema.pre('save', async function(this: IEvent) {
+eventSchema.pre('save', async function() {
   // Generate slug from title if title has changed or slug is empty
   if (this.isModified('title') || !this.slug) {
     this.slug = this.title
@@ -68,9 +85,9 @@ eventSchema.pre('save', async function(this: IEvent) {
 });
 
 // Add unique index on slug
-eventSchema.index({ slug: 1 }, { unique: true });
+// eventSchema.index({ slug: 1 }, { unique: true });
 
 // Event model
-const Event = mongoose.model<IEvent>('Event', eventSchema);
+const Event = mongoose.models.Event || mongoose.model<TEvent>('Event', eventSchema);
 
 export default Event;

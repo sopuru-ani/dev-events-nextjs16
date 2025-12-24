@@ -8,7 +8,7 @@ type Props = {
   image: string;
   slug: string;
   location: string;
-  date: string;
+  date: string | Date;
   time: string;
 };
 function EventCard({ title, image, slug, location, date, time }: Props) {
@@ -29,7 +29,13 @@ function EventCard({ title, image, slug, location, date, time }: Props) {
       <div className="datetime">
         <div>
           <Image src="/icons/calendar.svg" alt="date" width={14} height={14} />
-          <p>{date}</p>
+          <p>
+            {(() => {
+              const d = date instanceof Date ? date : new Date(date as string);
+              return d.toISOString().split("T")[0];
+            })()}
+            {/* {date.split("T")[0]} */}
+          </p>
         </div>
         <div>
           <Image src="/icons/clock.svg" alt="time" width={14} height={14} />
