@@ -5,6 +5,7 @@ import Event from './event.model';
 export interface IBooking extends Document {
   eventId: mongoose.Types.ObjectId;
   email: string;
+  slug: string;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -25,6 +26,7 @@ const bookingSchema = new Schema<IBooking>(
         message: 'Invalid email format',
       },
     },
+    slug: { type: String, required: true, trim: true },
   },
   {
     timestamps: true, // Auto-generates createdAt and updatedAt
